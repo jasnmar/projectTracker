@@ -1,124 +1,130 @@
-// save reference to important DOM elements
-var timeDisplayEl = $('#time-display');
-var projectDisplayEl = $('#project-display');
-var projectFormEl = $('#project-form');
-var projectNameInputEl = $('#project-name-input');
-var projectTypeInputEl = $('#project-type-input');
-var projectDateInputEl = $('#project-date-input');
+const projectObject = [
+    { Name:"project 1",  Type:"project type 1", Duedate:"07/01/71"},
+    { Name:"project 2",  Type:"project type 2", Duedate:"07/01/91"},
+]
 
-// handle displaying the time
-function displayTime() {
-  var rightNow = dayjs().format('MMM DD, YYYY [at] hh:mm:ss a');
-  timeDisplayEl.text(rightNow);
+if($(document).ready()) {
+    console.log("Document Ready");
+    setDate();
+    createCard();
+    buildTable(projectObject);
 }
 
-// Reads projects from local storage and returns array of project objects.
-// Returns an empty array ([]) if there aren't any projects.
-function readProjectsFromStorage() {
-  var projects = localStorage.getItem('projects');
-  if (projects) {
-    projects = JSON.parse(projects);
-  } else {
-    projects = [];
+function setDate() {
+    const dateEl = $('#date-time');
+    dateEl.text(dayjs().format('MMM D, YYYY [at] HH:mm:ss a'));
+    console.log(dateEl);
   }
-  return projects;
+
+var intervalId = window.setInterval(function(){
+setDate();
+//TODO: Set this to 1 second at the end.
+}, 5000);
+
+function createCard(){
+    const cardEl = $("#card");
+    const cardDiv = document.createElement('div');
+    cardDiv.classList.add("card");
+    cardDiv.setAttribute("style","width: 18rem");
+    const cardBody = document.createElement('div');
+    cardBody.classList.add("card-body");
+    const cardTitle = document.createElement('h5');
+    cardTitle.classList.add("card-title");
+    cardTitle.innerHTML= "Card title";
+    const cardInstructions = document.createElement('p');
+    cardInstructions.classList.add("card-text");
+    cardInstructions.innerHTML = "Texty text text texty very texty";
+    const cardButton = document.createElement('button');
+    cardButton.classList.add("btn","btn-primary");
+    cardButton.innerHTML = "Create Project";
+    cardBody.appendChild(cardTitle);
+    cardBody.appendChild(cardInstructions);
+    cardBody.appendChild(cardButton);
+    cardDiv.appendChild(cardBody);
+    cardEl.append(cardDiv);
+
+//   <div class="card" style="width: 18rem;">
+//   <div class="card-body">
+//     <h5 class="card-title">Card title</h5>
+//     <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+//     <a href="#" class="btn btn-primary">Go somewhere</a>
+//   </div>
+// </div>
+
 }
 
-// Takes an array of projects and saves them in localStorage.
-function saveProjectsToStorage(projects) {
-  localStorage.setItem('projects', JSON.stringify(projects));
-}
 
-// Gets project data from local storage and displays it
-function printProjectData() {
-  // clear current projects on the page
-  projectDisplayEl.empty();
 
-  // get projects from localStorage
-  var projects = readProjectsFromStorage();
-
-  // loop through each project and create a row
-  for (var i = 0; i < projects.length; i += 1) {
-    var project = projects[i];
-    var projectDate = dayjs(project.date);
-    // get date/time for start of today
-    var today = dayjs().startOf('day');
-
-    // Create row and columns for project
-    var rowEl = $('<tr>');
-    var nameEL = $('<td>').text(project.name);
-    var typeEl = $('<td>').text(project.type);
-    var dateEl = $('<td>').text(projectDate.format('MM/DD/YYYY'));
-
-    // Save the index of the project as a data-* attribute on the button. This
-    // will be used when removing the project from the array.
-    var deleteEl = $(
-      '<td><button class="btn btn-sm btn-delete-project" data-index="' +
-        i +
-        '">X</button></td>'
-    );
-
-    // add class to row by comparing project date to today's date
-    if (projectDate.isBefore(today)) {
-      rowEl.addClass('project-late');
-    } else if (projectDate.isSame(today)) {
-      rowEl.addClass('project-today');
+function buildTable(object) {
+    let keys = [];
+    for(i=0;i<object.length;i++){
+        console.log(object[i]);
+        console.log(Object.keys(object[i]));
+        keys = Object.keys(object[i]);
     }
+    const tableEl = document.getElementById("table");
+    
+    const dataTable = document.createElement('table')
+    tableEl.appendChild(dataTable);
+    dataTable.classList.add("table");
+    const tHead = document.createElement('thead');
+    dataTable.appendChild(tHead);
+    const tRow = document.createElement('tr');
+    tHead.appendChild(tRow);
+    for(i=0;i<keys.length;i++) {
+        const thEl = document.createElement('th');
+        thEl.setAttribute("scope","col");
+        thEl.innerHTML = keys[i];
+        tRow.appendChild(thEl);
+    }
+    const tBody = document.createElement('tbody');
+    dataTable.appendChild(tBody);
+    for(i=0;i<object.length;i++) {
+        const dtRow = document.createElement('tr');
+        const c1 = document.createElement('td');
+        c1.innerHTML = object[i].Name;
+        const c2 = document.createElement('td');
+        c2.innerHTML = object[i].Type;
+        const c3 = document.createElement('td');
+        c3.innerHTML = object[i].Duedate;
+        dtRow.appendChild(c1);
+        dtRow.appendChild(c2);
+        dtRow.appendChild(c3);
+        tBody.appendChild(dtRow);
 
-    // append elements to DOM to display them
-    rowEl.append(nameEL, typeEl, dateEl, deleteEl);
-    projectDisplayEl.append(rowEl);
-  }
+    }
+    
+
 }
+/* <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table> */
 
-// Removes a project from local storage and prints the project data
-function handleDeleteProject() {
-  var projectIndex = parseInt($(this).attr('data-index'));
-  var projects = readProjectsFromStorage();
-  // remove project from the array
-  projects.splice(projectIndex, 1);
-  saveProjectsToStorage(projects);
 
-  // print projects
-  printProjectData();
-}
-
-// Adds a project to local storage and prints the project data
-function handleProjectFormSubmit(event) {
-  event.preventDefault();
-
-  // read user input from the form
-  var projectName = projectNameInputEl.val().trim();
-  var projectType = projectTypeInputEl.val(); // don't need to trim select input
-  var projectDate = projectDateInputEl.val(); // yyyy-mm-dd format
-
-  var newProject = {
-    name: projectName,
-    type: projectType,
-    date: projectDate,
-  };
-
-  // add project to local storage
-  var projects = readProjectsFromStorage();
-  projects.push(newProject);
-  saveProjectsToStorage(projects);
-
-  // print project data
-  printProjectData();
-
-  // clear the form inputs
-  projectNameInputEl.val('');
-  projectTypeInputEl.val('');
-  projectDateInputEl.val('');
-}
-
-projectFormEl.on('submit', handleProjectFormSubmit);
-
-// Use jQuery event delegation to listen for clicks on dynamically added delete
-// buttons.
-projectDisplayEl.on('click', '.btn-delete-project', handleDeleteProject);
-
-displayTime();
-setInterval(displayTime, 1000);
-
-printProjectData();
